@@ -2,13 +2,13 @@
 const { EmbedBuilder } = require("discord.js");
 
 const config = {
-  color: process.env.COLOR || "#61CB2B", // Color por defecto si no se define en las variables de entorno
+  color: process.env.COLOR || "#61CB2B",
   footerText: process.env.FOOTER_TEXT || "Desarrollado por: Bersek",
   footerIcon: process.env.FOOTER_ICON || "",
 };
 
 module.exports.createEmbed = (options = {}) => {
-  const embed = new EmbedBuilder();
+  const embed = new EmbedBuilder(); // Asegúrate de que esta línea no arroje un error
 
   embed.setColor(config.color || "DEFAULT");
 
@@ -20,8 +20,8 @@ module.exports.createEmbed = (options = {}) => {
   if (options.author) {
     embed.setAuthor({
       name: options.author.name,
-      iconURL: options.author.icon || null, 
-      url: options.author.url || null, 
+      iconURL: options.author.icon || null,
+      url: options.author.url || null,
     });
   }
   

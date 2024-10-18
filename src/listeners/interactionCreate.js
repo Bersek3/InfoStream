@@ -21,13 +21,15 @@ module.exports = class extends Listener {
     } catch (error) {
       console.error(`Error handling interaction ${interaction.customId}:`, error);
 
-      const errorEmbed = createEmbed(
-        "An error occurred",
-        "Please try again later.",
-        process.env.FOOTER_TEXT // Utilizamos la variable de entorno en lugar del config.json
-      );
+      const errorEmbed = createEmbed({
+        title: "An error occurred",
+        description: "Please try again later.",
+        footer: {
+          text: process.env.FOOTER_TEXT // Utilizamos la variable de entorno en lugar del config.json
+        }
+      });
 
-      // Enviar respuesta de error de manera ephemera (visible solo para el usuario)
+      // Enviar respuesta de error de manera efímera (visible solo para el usuario)
       if (interaction.replied || interaction.deferred) {
         // Si la interacción ya fue respondida o está en proceso de respuesta
         await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
