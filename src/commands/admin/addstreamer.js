@@ -7,8 +7,8 @@ module.exports = class AddStreamerCommand extends Command {
   constructor(context, options) {
     super(context, {
       ...options,
-      name: "addstreamer",
-      description: "Add a streamer to track.",
+      name: "agregarstreamer",
+      description: "Agregar un streamer para hacer seguimiento.",
     });
   }
 
@@ -19,8 +19,8 @@ module.exports = class AddStreamerCommand extends Command {
         .setDescription(this.description)
         .addStringOption((option) =>
           option
-            .setName("platform")
-            .setDescription("The platform of the streamer")
+            .setName("plataforma")
+            .setDescription("La plataforma del streamer")
             .setRequired(true)
             .addChoices(
               { name: "YouTube", value: "youtube" },
@@ -32,14 +32,14 @@ module.exports = class AddStreamerCommand extends Command {
         )
         .addStringOption((option) =>
           option
-            .setName("name")
-            .setDescription("The name of the streamer")
+            .setName("nombre")
+            .setDescription("El nombre del streamer")
             .setRequired(true)
         )
         .addStringOption((option) =>
           option
-            .setName("channel")
-            .setDescription("The channel to send notifications to")
+            .setName("canal")
+            .setDescription("El canal para enviar notificaciones")
             .setRequired(true)
         )
     );
@@ -50,48 +50,48 @@ module.exports = class AddStreamerCommand extends Command {
 
     if (!interaction.member.permissions.has("ADMINISTRATOR")) {
       const embed = createEmbed({
-        description: "❌ You don't have permission to use this command.",
+        description: "❌ No tienes permiso para usar este comando.",
       });
       return interaction.followUp({ embeds: [embed] });
     }
 
     const guildId = interaction.guildId;
-    const platform = interaction.options.getString("platform");
-    const name = interaction.options.getString("name");
-    const channel = interaction.options
-      .getString("channel")
+    const plataforma = interaction.options.getString("plataforma");
+    const nombre = interaction.options.getString("nombre");
+    const canal = interaction.options
+      .getString("canal")
       .replace(/[<#>]/g, "");
 
-    const defaultStreamerData = {
+    const datosStreamerPorDefecto = {
       streamers: [],
     };
 
     const streamers = guildSettings.ensure(
       guildId,
-      defaultStreamerData
+      datosStreamerPorDefecto
     ).streamers;
 
-    const newStreamer = {
-      id: `${platform}:${name}`,
-      name,
-      platform,
-      channelID: channel,
+    const nuevoStreamer = {
+      id: `${plataforma}:${nombre}`,
+      nombre,
+      plataforma,
+      channelID: canal,
       isLive: false,
       lastLiveAt: null,
     };
 
-    if (streamers.some((s) => s.id === newStreamer.id)) {
+    if (streamers.some((s) => s.id === nuevoStreamer.id)) {
       const embed = createEmbed({
-        description: "❌ This streamer is already being tracked.",
+        description: "❌ Este streamer ya está siendo seguido.",
       });
       return interaction.followUp({ embeds: [embed] });
     }
 
-    streamers.push(newStreamer);
+    streamers.push(nuevoStreamer);
     guildSettings.set(guildId, { streamers });
 
     const embed = createEmbed({
-      description: `✅ Successfully added ${name} on ${platform} to the tracking list.`,
+      description: `✅ Se agregó exitosamente a ${nombre} en ${plataforma} a la lista de seguimiento.`,
     });
     await interaction.followUp({ embeds: [embed] });
   }

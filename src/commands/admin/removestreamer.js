@@ -7,8 +7,8 @@ module.exports = class RemoveStreamerCommand extends Command {
   constructor(context, options) {
     super(context, {
       ...options,
-      name: "removestreamer",
-      description: "Remove a streamer from tracking.",
+      name: "eliminarstreamer",
+      description: "Eliminar un streamer del seguimiento.",
     });
   }
 
@@ -19,8 +19,8 @@ module.exports = class RemoveStreamerCommand extends Command {
         .setDescription(this.description)
         .addStringOption((option) =>
           option
-            .setName("name")
-            .setDescription("The name of the streamer to remove")
+            .setName("nombre")
+            .setDescription("El nombre del streamer a eliminar")
             .setRequired(true)
         )
     );
@@ -31,31 +31,31 @@ module.exports = class RemoveStreamerCommand extends Command {
 
     if (!interaction.member.permissions.has("MANAGE_CHANNELS")) {
       const embed = createEmbed({
-        description: "❌ You don't have permission to use this command.",
+        description: "❌ No tienes permiso para usar este comando.",
       });
       return interaction.followUp({ embeds: [embed] });
     }
 
     const guildId = interaction.guildId;
-    const name = interaction.options.getString("name");
+    const nombre = interaction.options.getString("nombre");
     const streamers = guildSettings.get(guildId, "streamers", []);
 
-    const streamerIndex = streamers.findIndex(
-      (s) => s.name.toLowerCase() === name.toLowerCase()
+    const indiceStreamer = streamers.findIndex(
+      (s) => s.name.toLowerCase() === nombre.toLowerCase()
     );
 
-    if (streamerIndex === -1) {
+    if (indiceStreamer === -1) {
       const embed = createEmbed({
-        description: `❌ Streamer ${name} was not found in the tracking list.`,
+        description: `❌ El streamer ${nombre} no se encontró en la lista de seguimiento.`,
       });
       return interaction.followUp({ embeds: [embed] });
     }
 
-    streamers.splice(streamerIndex, 1);
+    streamers.splice(indiceStreamer, 1);
     guildSettings.set(guildId, "streamers", streamers);
 
     const embed = createEmbed({
-      description: `✅ Successfully removed ${name} from the tracking list.`,
+      description: `✅ Se eliminó exitosamente a ${nombre} de la lista de seguimiento.`,
     });
     await interaction.followUp({ embeds: [embed] });
   }
