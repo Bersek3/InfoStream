@@ -48,6 +48,7 @@ module.exports = class AddStreamerCommand extends Command {
   async chatInputRun(interaction) {
     await interaction.deferReply({ ephemeral: true });
 
+    // Check if the user has ADMINISTRATOR permission
     if (!interaction.member.permissions.has("ADMINISTRATOR")) {
       const embed = createEmbed({
         description: "❌ No tienes permiso para usar este comando.",
@@ -58,19 +59,16 @@ module.exports = class AddStreamerCommand extends Command {
     const guildId = interaction.guildId;
     const plataforma = interaction.options.getString("plataforma");
     const nombre = interaction.options.getString("nombre");
-    const canal = interaction.options
-      .getString("canal")
-      .replace(/[<#>]/g, "");
+    const canal = interaction.options.getString("canal").replace(/[<#>]/g, "");
 
     const datosStreamerPorDefecto = {
       streamers: [],
     };
 
-    const streamers = guildSettings.ensure(
-      guildId,
-      datosStreamerPorDefecto
-    ).streamers;
+    // Ensure guild settings exist and get current streamers
+    const streamers = guildSettings.ensure(guildId, datosStreamerPorDefecto).streamers;
 
+    // Create a new streamer object
     const nuevoStreamer = {
       id: `${plataforma}:${nombre}`,
       nombre,
@@ -80,6 +78,7 @@ module.exports = class AddStreamerCommand extends Command {
       lastLiveAt: null,
     };
 
+    // Check if the streamer is already being tracked
     if (streamers.some((s) => s.id === nuevoStreamer.id)) {
       const embed = createEmbed({
         description: "❌ Este streamer ya está siendo seguido.",
@@ -87,9 +86,11 @@ module.exports = class AddStreamerCommand extends Command {
       return interaction.followUp({ embeds: [embed] });
     }
 
+    // Add the new streamer to the list and save to guild settings
     streamers.push(nuevoStreamer);
     guildSettings.set(guildId, { streamers });
 
+    // Send confirmation message
     const embed = createEmbed({
       description: `✅ Se agregó exitosamente a ${nombre} en ${plataforma} a la lista de seguimiento.`,
     });

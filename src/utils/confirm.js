@@ -2,6 +2,9 @@
 const { MessageActionRow, MessageButton } = require("discord.js");
 
 const confirm = async (interaction, prompt) => {
+  // Deferir la interacción para evitar problemas de tiempo de espera
+  await interaction.deferReply({ ephemeral: true });
+
   const row = new MessageActionRow().addComponents(
     new MessageButton()
       .setCustomId("confirm_yes")
@@ -13,11 +16,17 @@ const confirm = async (interaction, prompt) => {
       .setStyle("DANGER")
   );
 
-  await interaction.followUp({ content: prompt, components: [row] });
+  try {
+    await interaction.followUp({ content: prompt, components: [row] });
+  } catch (error) {
+    console.error('Error sending confirmation message:', error);
+    return false; // Retorna false si hay un error
+  }
 
   const filter = (i) => {
-    i.deferUpdate();
-    return i.customId === "confirm_yes" || i.customId === "confirm_no";
+    // Verifica que el autor de la interacción sea el mismo que la interacción inicial
+    return i.user.id === interaction.user.id && 
+           (i.customId === "confirm_yes" || i.customId === "confirm_no");
   };
 
   return new Promise((resolve) => {
@@ -27,12 +36,13 @@ const confirm = async (interaction, prompt) => {
     });
 
     collector.on("collect", (i) => {
+      i.deferUpdate(); // Deferir la interacción para evitar errores
       resolve(i.customId === "confirm_yes");
       collector.stop();
     });
 
     collector.on("end", () => {
-      resolve(false);
+      resolve(false); // Resuelve como false si el tiempo se agota
     });
   });
 };

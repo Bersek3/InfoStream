@@ -21,7 +21,7 @@ const activities = [
 ];
 
 const client = new SapphireClient({
-  intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES"],
+  intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES", "GUILD_VOICE_STATES"],
 });
 
 client.once("ready", () => {
@@ -51,5 +51,6 @@ client.once("ready", () => {
   }, 30000);
 });
 
-// Aquí reemplazamos config.token por process.env.BOT_TOKEN
-client.login(process.env.BOT_TOKEN);
+// Manejo de errores para el inicio de sesión
+client.login(process.env.BOT_TOKEN)
+  .catch(err => console.error('Failed to login:', err));

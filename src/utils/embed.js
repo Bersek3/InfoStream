@@ -8,10 +8,13 @@ const config = {
 };
 
 module.exports.createEmbed = (options = {}) => {
-  const embed = new EmbedBuilder(); // Asegúrate de que esta línea no arroje un error
+  const embed = new EmbedBuilder();
 
-  embed.setColor(config.color || "DEFAULT");
+  // Validación del color
+  const embedColor = config.color.startsWith('#') ? config.color : "#61CB2B";
+  embed.setColor(embedColor);
 
+  // Establecer las propiedades del embed
   if (options.title) embed.setTitle(options.title);
   if (options.description) embed.setDescription(options.description);
   if (options.url) embed.setURL(options.url);
@@ -28,6 +31,7 @@ module.exports.createEmbed = (options = {}) => {
   if (options.thumbnail) embed.setThumbnail(options.thumbnail);
   if (options.image) embed.setImage(options.image);
 
+  // Establecer el pie de página
   if (config.footerText || config.footerIcon) {
     embed.setFooter({
       text: config.footerText,
@@ -35,8 +39,9 @@ module.exports.createEmbed = (options = {}) => {
     });
   }
 
+  // Añadir la marca de tiempo
   if (options.timestamp) {
-    embed.setTimestamp(new Date());
+    embed.setTimestamp();
   }
 
   return embed;

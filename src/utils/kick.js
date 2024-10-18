@@ -7,37 +7,40 @@ async function checkKickLive(streamer) {
   try {
     const data = await kickApi.fetchChannelData(streamer.name);
 
-    if (data && data.livestream && data.livestream.is_live) {
-      const cleanedBio = data.user.bio.replace(/\[7TV:[^\]]+\]/g, "").trim();
+    // Validar que se recibió data y que la información requerida está presente
+    if (data && data.user && data.livestream) {
+      const { livestream, user } = data;
 
-      const result = {
-        isLive: true,
-        streamer: {
-          platform: "kick",
-          username: data.user.username,
-          bio: cleanedBio,
-          followersCount: data.followers_count,
-          profileImageUrl: data.user.profile_pic,
-          verified: data.verified,
-          name: streamer.name,
-          title: data.livestream.session_title,
-          viewers: data.livestream.viewer_count,
-          imageUrl: data.user.profile_pic,
-          startedAt: data.livestream.start_time,
-          url: `https://kick.com/${streamer.name}`,
-        },
-      };
+      // Comprobar si el streamer está en vivo
+      if (livestream.is_live) {
+        const cleanedBio = user.bio ? user.bio.replace(/\[7TV:[^\]]+\]/g, "").trim() : "Sin biografía disponible";
 
-      return result;
+        const result = {
+          isLive: true,
+          streamer: {
+            platform: "kick",
+            username: user.username,
+            bio: cleanedBio,
+            followersCount: data.followers_count,
+            profileImageUrl: user.profile_pic,
+            verified: data.verified,
+            name: streamer.name,
+            title: livestream.session_title || "Sin título",
+            viewers: livestream.viewer_count || 0,
+            imageUrl: user.profile_pic,
+            startedAt: livestream.start_time || new Date().toISOString(),
+            url: `https://kick.com/${streamer.name}`,
+          },
+        };
+
+        return result;
+      }
     }
 
     return { isLive: false };
   } catch (error) {
-    console.error(
-      `Error checking Kick live status for ${streamer.name}:`,
-      error
-    );
-    return { isLive: false, error: error.message };
+    console.error(`Error checking Kick live status for ${streamer.name}:`, error);
+    return { isLive: false, error: error.message || "Error desconocido" };
   }
 }
 
