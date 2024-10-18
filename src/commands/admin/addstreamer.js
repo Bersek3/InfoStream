@@ -1,3 +1,4 @@
+// src/commands/social/addstreamer.js
 const { Command } = require("@sapphire/framework");
 const { guildSettings } = require("../../../db");
 const { createEmbed } = require("../../utils/embed");
@@ -6,8 +7,8 @@ module.exports = class AddStreamerCommand extends Command {
   constructor(context, options) {
     super(context, {
       ...options,
-      name: "agregarstreamer",
-      description: "Agregar un streamer para hacer seguimiento.",
+      name: "addstreamer",
+      description: "Add a streamer to track.",
     });
   }
 
@@ -18,8 +19,8 @@ module.exports = class AddStreamerCommand extends Command {
         .setDescription(this.description)
         .addStringOption((option) =>
           option
-            .setName("plataforma")
-            .setDescription("La plataforma del streamer")
+            .setName("platform")
+            .setDescription("The platform of the streamer")
             .setRequired(true)
             .addChoices(
               { name: "YouTube", value: "youtube" },
@@ -31,14 +32,14 @@ module.exports = class AddStreamerCommand extends Command {
         )
         .addStringOption((option) =>
           option
-            .setName("nombre")
-            .setDescription("El nombre del streamer")
+            .setName("name")
+            .setDescription("The name of the streamer")
             .setRequired(true)
         )
         .addStringOption((option) =>
           option
-            .setName("canal")
-            .setDescription("El canal para enviar notificaciones")
+            .setName("channel")
+            .setDescription("The channel to send notifications to")
             .setRequired(true)
         )
     );
@@ -47,51 +48,50 @@ module.exports = class AddStreamerCommand extends Command {
   async chatInputRun(interaction) {
     await interaction.deferReply({ ephemeral: true });
 
-    // Check if the user has ADMINISTRATOR permission
     if (!interaction.member.permissions.has("ADMINISTRATOR")) {
       const embed = createEmbed({
-        description: "❌ No tienes permiso para usar este comando.",
+        description: "❌ You don't have permission to use this command.",
       });
       return interaction.followUp({ embeds: [embed] });
     }
 
     const guildId = interaction.guildId;
-    const plataforma = interaction.options.getString("plataforma");
-    const nombre = interaction.options.getString("nombre");
-    const canal = interaction.options.getString("canal").replace(/[<#>]/g, "");
+    const platform = interaction.options.getString("platform");
+    const name = interaction.options.getString("name");
+    const channel = interaction.options
+      .getString("channel")
+      .replace(/[<#>]/g, "");
 
-    const datosStreamerPorDefecto = {
+    const defaultStreamerData = {
       streamers: [],
     };
 
-    // Ensure guild settings exist and get current streamers
-    const streamers = guildSettings.ensure(guildId, datosStreamerPorDefecto).streamers;
+    const streamers = guildSettings.ensure(
+      guildId,
+      defaultStreamerData
+    ).streamers;
 
-    // Create a new streamer object
-    const nuevoStreamer = {
-      id: `${plataforma}:${nombre}`,
-      nombre,
-      plataforma,
-      channelID: canal,
+    const newStreamer = {
+      id: `${platform}:${name}`,
+      name,
+      platform,
+      channelID: channel,
       isLive: false,
       lastLiveAt: null,
     };
 
-    // Check if the streamer is already being tracked
-    if (streamers.some((s) => s.id === nuevoStreamer.id)) {
+    if (streamers.some((s) => s.id === newStreamer.id)) {
       const embed = createEmbed({
-        description: "❌ Este streamer ya está siendo seguido.",
+        description: "❌ This streamer is already being tracked.",
       });
       return interaction.followUp({ embeds: [embed] });
     }
 
-    // Add the new streamer to the list and save to guild settings
-    streamers.push(nuevoStreamer);
+    streamers.push(newStreamer);
     guildSettings.set(guildId, { streamers });
 
-    // Send confirmation message
     const embed = createEmbed({
-      description: `✅ Se agregó exitosamente a ${nombre} en ${plataforma} a la lista de seguimiento.`,
+      description: `✅ Successfully added ${name} on ${platform} to the tracking list.`,
     });
     await interaction.followUp({ embeds: [embed] });
   }
