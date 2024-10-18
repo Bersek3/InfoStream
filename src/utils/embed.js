@@ -1,37 +1,44 @@
 // src/utils/createEmbed.js
 const { MessageEmbed } = require("discord.js");
-
-const config = {
-  color: process.env.COLOR || "#61CB2B",
-  footerText: process.env.FOOTER_TEXT || "Desarrollado por: Bersek",
-  footerIcon: process.env.FOOTER_ICON || "",
-};
+require('dotenv').config(); // Cargar variables del archivo .env
 
 module.exports.createEmbed = (options = {}) => {
-  const embed = new EmbedBuilder(); // Asegúrate de que esta línea no arroje un error
+  if (!options || Object.keys(options).length === 0) {
+    return new MessageEmbed();
+  }
 
-  embed.setColor(config.color || "DEFAULT");
+  const embed = new MessageEmbed();
+
+  // Acceder a las variables desde process.env
+  embed.setColor(process.env.BOT_COLOR || "DEFAULT");
 
   if (options.title) embed.setTitle(options.title);
+
   if (options.description) embed.setDescription(options.description);
+
   if (options.url) embed.setURL(options.url);
+
   if (options.fields) embed.addFields(options.fields);
-  
+
   if (options.author) {
     embed.setAuthor({
       name: options.author.name,
-      iconURL: options.author.icon || null,
-      url: options.author.url || null,
+      iconURL: options.author.icon,
+      url: options.author.url,
     });
   }
-  
+
   if (options.thumbnail) embed.setThumbnail(options.thumbnail);
+
   if (options.image) embed.setImage(options.image);
 
-  if (config.footerText || config.footerIcon) {
+  if (options.video) embed.setVideo(options.video);
+
+  // Usar las variables de entorno para el pie de página
+  if (process.env.BOT_FOOTER_TEXT || process.env.BOT_FOOTER_ICON) {
     embed.setFooter({
-      text: config.footerText,
-      iconURL: config.footerIcon || null,
+      text: process.env.BOT_FOOTER_TEXT || "",
+      iconURL: process.env.BOT_FOOTER_ICON || undefined,
     });
   }
 

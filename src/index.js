@@ -1,6 +1,6 @@
 // src/index.js
-require('dotenv').config(); // Cargar las variables de entorno desde .env
 require("sapphire-plugin-modal-commands/register");
+require('dotenv').config(); // Cargar variables del archivo .env
 const { SapphireClient } = require("@sapphire/framework");
 const { guildSettings } = require("../db");
 const streamAlerts = require("./utils/streamAlerts");
@@ -21,7 +21,7 @@ const activities = [
 ];
 
 const client = new SapphireClient({
-  intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES", "GUILD_VOICE_STATES"],
+  intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES"],
 });
 
 client.once("ready", () => {
@@ -51,6 +51,5 @@ client.once("ready", () => {
   }, 30000);
 });
 
-// Manejo de errores para el inicio de sesión
-client.login(process.env.BOT_TOKEN)
-  .catch(err => console.error('Failed to login:', err));
+// Aquí usamos process.env para obtener el token desde el archivo .env
+client.login(process.env.BOT_TOKEN);
