@@ -8,36 +8,25 @@ const config = {
 };
 
 module.exports.createEmbed = (options = {}) => {
-  if (!options || Object.keys(options).length === 0) {
-    return new EmbedBuilder();
-  }
-
   const embed = new EmbedBuilder();
 
   embed.setColor(config.color || "DEFAULT");
 
   if (options.title) embed.setTitle(options.title);
-
   if (options.description) embed.setDescription(options.description);
-
   if (options.url) embed.setURL(options.url);
-
   if (options.fields) embed.addFields(options.fields);
-
+  
   if (options.author) {
     embed.setAuthor({
       name: options.author.name,
-      iconURL: options.author.icon,
-      url: options.author.url,
+      iconURL: options.author.icon || null, // Asegúrate de que iconURL pueda ser nulo
+      url: options.author.url || null, // Asegúrate de que url pueda ser nulo
     });
   }
-
+  
   if (options.thumbnail) embed.setThumbnail(options.thumbnail);
-
   if (options.image) embed.setImage(options.image);
-
-  // Discord.js v14 no soporta directamente videos en los embeds
-  // Si usas una versión diferente puedes agregar soporte aquí
 
   if (config.footerText || config.footerIcon) {
     embed.setFooter({
