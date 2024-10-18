@@ -1,4 +1,3 @@
-// src/commands/social/addstreamer.js
 const { Command } = require("@sapphire/framework");
 const { guildSettings } = require("../../../db");
 const { createEmbed } = require("../../utils/embed");
