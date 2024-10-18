@@ -20,8 +20,8 @@ module.exports.createEmbed = (options = {}) => {
   if (options.author) {
     embed.setAuthor({
       name: options.author.name,
-      iconURL: options.author.icon || null, // Asegúrate de que iconURL pueda ser nulo
-      url: options.author.url || null, // Asegúrate de que url pueda ser nulo
+      iconURL: options.author.icon || null, 
+      url: options.author.url || null, 
     });
   }
   
